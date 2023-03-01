@@ -10,16 +10,29 @@ class QCheckBox;
 class QPlainTextEdit;
 QT_END_NAMESPACE
 
+namespace Utils { class PathChooser; }
+
 namespace BareMetal::Internal {
 
 // GenericGdbServerProvider
 
 class GenericGdbServerProvider final : public GdbServerProvider
 {
+public:
+    QVariantMap toMap() const final;
+    bool fromMap(const QVariantMap &data) final;
+
+    bool operator==(const IDebugServerProvider &other) const final;
+
+    Utils::CommandLine command() const final;
+
 private:
     GenericGdbServerProvider();
     QSet<StartupMode> supportedStartupModes() const final;
 
+    Utils::FilePath m_executableFile;
+    QString m_additionalArguments;
+    
     friend class GenericGdbServerProviderConfigWidget;
     friend class GenericGdbServerProviderFactory;
     friend class BareMetalDevice;
@@ -49,6 +62,8 @@ private:
     void setFromProvider();
 
     HostWidget *m_hostWidget = nullptr;
+    Utils::PathChooser *m_executableFileChooser = nullptr;
+    QLineEdit *m_additionalArgumentsLineEdit = nullptr;
     QCheckBox *m_useExtendedRemoteCheckBox = nullptr;
     QPlainTextEdit *m_initCommandsTextEdit = nullptr;
     QPlainTextEdit *m_resetCommandsTextEdit = nullptr;
